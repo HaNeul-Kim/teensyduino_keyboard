@@ -1,4 +1,11 @@
-const int FN1 = -1, FN2 = -2, FN3 = -3, MY_CAPS_LOCK = -11, MY_LCLICK = -21, MY_RCLICK = -22;
+const int FN1 = -1,
+          FN2 = -2,
+          FN3 = -3,
+          MY_CAPS_LOCK = -11,
+          MY_LCLICK = -21,
+          MY_RCLICK = -22,
+          MY_COPY = -23,
+          MY_CALC = -24;
 int capsState;// 0: not press, 1: caps lock press, 2: fn press
 boolean fn1, fn2, fn3, caps;
 
@@ -13,11 +20,11 @@ int keymap[2][6][17] = {
   },
   {
     {KEY_ESC, 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLL_LOCK, KEY_PAUSE},//  18
-    {KEY_TILDE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MEDIA_VOLUME_DEC, KEY_MEDIA_VOLUME_INC, KEY_MEDIA_MUTE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
+    {KEY_TILDE, KEY_1, KEY_2, KEY_3, MY_CALC, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MEDIA_VOLUME_DEC, KEY_MEDIA_VOLUME_INC, KEY_MEDIA_MUTE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
     {KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_UP, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_BACKSLASH, 0, KEY_END, KEY_PAGE_DOWN},// 20
     {MY_CAPS_LOCK, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_L, KEY_SEMICOLON, KEY_QUOTE, KEY_RETURN, 0, 0, 0, 0},//    21
     {KEY_LEFT_SHIFT, 0, KEY_Z, KEY_X, KEY_CAPS_LOCK, KEY_V, KEY_BACKSPACE, KEY_N, KEY_DELETE, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT, 0, 0, 0, 0},//    22
-    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_LEFT_CTRL, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, 254, KEY_RIGHT_CTRL, 0, 0, 0}//    23
+    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_LEFT_CTRL, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, MY_COPY, KEY_RIGHT_CTRL, 0, 0, 0}//    23
   }
 };
 
@@ -143,6 +150,32 @@ void loop() {
             delay(500);
             Mouse.release();
             break;
+          case MY_COPY:
+            Keyboard.set_modifier(MODIFIERKEY_CTRL);
+            Keyboard.send_now();
+            Keyboard.set_key1(KEY_C);
+            Keyboard.send_now();
+            Keyboard.set_modifier(0);
+            Keyboard.set_key1(0);
+            Keyboard.send_now();
+            break;
+          case MY_CALC:
+            Keyboard.set_modifier(MODIFIERKEY_GUI);
+            Keyboard.send_now();
+            Keyboard.set_key1(KEY_R);
+            Keyboard.send_now();
+            Keyboard.set_modifier(0);
+            Keyboard.set_key1(0);
+            Keyboard.send_now();
+            delay(20);
+            
+            sendKey(KEY_C);
+            sendKey(KEY_A);
+            sendKey(KEY_L);
+            sendKey(KEY_C);
+            sendKey(KEY_RETURN);
+            delay(500);
+            break;
           default:
             if (capsState == 1) {
               capsState = 2;
@@ -155,4 +188,9 @@ void loop() {
       digitalWrite(col, HIGH);
     }
   }
+}
+
+void sendKey(int key) {
+  Keyboard.press(key);
+  Keyboard.release(key);
 }
