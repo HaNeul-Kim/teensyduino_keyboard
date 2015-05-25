@@ -1,3 +1,26 @@
+const int FN1 = -1, FN2 = -2, FN3 = -3, MY_CAPS_LOCK = -11, MY_LCLICK = -21, MY_RCLICK = -22;
+int capsState;// 0: not press, 1: caps lock press, 2: fn press
+boolean fn1, fn2, fn3, caps;
+
+int keymap[2][6][17] = {
+  {
+    {KEY_ESC, 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLL_LOCK, KEY_PAUSE},//  18
+    {KEY_TILDE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUAL, KEY_BACKSPACE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
+    {KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_BACKSLASH, KEY_DELETE, KEY_END, KEY_PAGE_DOWN},// 20
+    {MY_CAPS_LOCK, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_QUOTE, KEY_RETURN, 0, 0, 0, 0},//    21
+    {KEY_LEFT_SHIFT, 0, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT, 0, 0, KEY_UP, 0},//    22
+    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_SPACE, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, MY_RCLICK, KEY_RIGHT_CTRL, KEY_LEFT, KEY_DOWN, KEY_RIGHT}//    23
+  },
+  {
+    {KEY_ESC, 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLL_LOCK, KEY_PAUSE},//  18
+    {KEY_TILDE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MEDIA_VOLUME_DEC, KEY_MEDIA_VOLUME_INC, KEY_MEDIA_MUTE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
+    {KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_UP, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_BACKSLASH, 0, KEY_END, KEY_PAGE_DOWN},// 20
+    {MY_CAPS_LOCK, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_L, KEY_SEMICOLON, KEY_QUOTE, KEY_RETURN, 0, 0, 0, 0},//    21
+    {KEY_LEFT_SHIFT, 0, KEY_Z, KEY_X, KEY_CAPS_LOCK, KEY_V, KEY_BACKSPACE, KEY_N, KEY_DELETE, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT, 0, 0, 0, 0},//    22
+    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_LEFT_CTRL, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, 254, KEY_RIGHT_CTRL, 0, 0, 0}//    23
+  }
+};
+
 void setup() {
   Serial.begin(9600);
   pinMode(1, OUTPUT);
@@ -24,29 +47,8 @@ void setup() {
   pinMode(22, INPUT_PULLUP);
   pinMode(23, INPUT_PULLUP);
   Keyboard.begin();
+  Mouse.begin();
 }
-const int FN1 = -1, FN2 = -2, FN3 = -3, MY_CAPS_LOCK = -11;
-int capsState;// 0: not press, 1: caps lock press, 2: fn press
-boolean fn1, fn2, fn3, caps;
-
-int keymap[2][6][17] = {
-  {
-    {KEY_ESC, 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLL_LOCK, KEY_PAUSE},//  18
-    {KEY_TILDE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUAL, KEY_BACKSPACE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
-    {KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_BACKSLASH, KEY_DELETE, KEY_END, KEY_PAGE_DOWN},// 20
-    {MY_CAPS_LOCK, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_QUOTE, KEY_RETURN, 0, 0, 0, 0},//    21
-    {KEY_LEFT_SHIFT, 0, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT, 0, 0, KEY_UP, 0},//    22
-    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_SPACE, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, 254, KEY_RIGHT_CTRL, KEY_LEFT, KEY_DOWN, KEY_RIGHT}//    23
-  },
-  {
-    {KEY_ESC, 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_PRINTSCREEN, KEY_SCROLL_LOCK, KEY_PAUSE},//  18
-    {KEY_TILDE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MEDIA_VOLUME_DEC, KEY_MEDIA_VOLUME_INC, KEY_MEDIA_MUTE, KEY_INSERT, KEY_HOME, KEY_PAGE_UP},// 19
-    {KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_UP, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACE, KEY_RIGHT_BRACE, KEY_BACKSLASH, 0, KEY_END, KEY_PAGE_DOWN},// 20
-    {MY_CAPS_LOCK, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_LEFT, KEY_DOWN, KEY_RIGHT, KEY_L, KEY_SEMICOLON, KEY_QUOTE, KEY_RETURN, 0, 0, 0, 0},//    21
-    {KEY_LEFT_SHIFT, 0, KEY_Z, KEY_X, KEY_CAPS_LOCK, KEY_V, KEY_BACKSPACE, KEY_N, KEY_DELETE, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT, 0, 0, 0, 0},//    22
-    {FN1, KEY_LEFT_CTRL, KEY_LEFT_GUI, KEY_LEFT_ALT, 0, KEY_LEFT_CTRL, 0, 0, 0, KEY_RIGHT_GUI, FN2, FN3, 254, KEY_RIGHT_CTRL, 0, 0, 0}//    23
-  }
-};
 
 void loop() {
   for (int row = 18; row <= 23; row++) {
@@ -62,27 +64,37 @@ void loop() {
       digitalRead(row);
       digitalRead(row);
       if (digitalRead(row)) {
-        if (pressKey == FN1) {
-          fn1 = false;
-        } else if (pressKey == FN2) {
-          fn2 = false;
-        } else if (pressKey == FN3) {
-          fn3 = false;
-        } else if (pressKey == MY_CAPS_LOCK) {
-          switch (capsState) {
-            case 1:
-              capsState = 0;
-              caps = false;
-              Keyboard.press(KEY_CAPS_LOCK);
-              Keyboard.release(pressKey);
-            case 2:
-              capsState = 0;
-              caps = false;
-            default:
-              break;
-          }
-        } else {
-          Keyboard.release(pressKey);
+        switch (pressKey) {
+          case FN1:
+            fn1 = false;
+            break;
+          case FN2:
+            fn2 = false;
+            break;
+          case FN3:
+            fn3 = false;
+            break;
+          case MY_CAPS_LOCK:
+            switch (capsState) {
+              case 1:
+                capsState = 0;
+                caps = false;
+                Keyboard.press(KEY_CAPS_LOCK);
+                Keyboard.release(pressKey);
+              case 2:
+                capsState = 0;
+                caps = false;
+              default:
+                break;
+            }
+            break;
+          case MY_LCLICK:
+          case MY_RCLICK:
+            Mouse.release();
+            break;
+          default:
+            Keyboard.release(pressKey);
+            break;
         }
       } else {
 //        Serial.print("press row = ");
@@ -116,10 +128,20 @@ void loop() {
           case KEY_MEDIA_VOLUME_DEC:
           case KEY_MEDIA_VOLUME_INC:
           case KEY_MEDIA_MUTE:
-            Keyboard.set_media(pressKey);
+            Keyboard.set_media(pressKey);// not work windows
             Keyboard.send_now();
             Keyboard.set_media(0);
             Keyboard.send_now();
+            break;
+          case MY_LCLICK:
+            Mouse.click(MOUSE_LEFT);
+            delay(500);
+            Mouse.release();
+            break;
+          case MY_RCLICK:
+            Mouse.click(MOUSE_RIGHT);
+            delay(500);
+            Mouse.release();
             break;
           default:
             if (capsState == 1) {
